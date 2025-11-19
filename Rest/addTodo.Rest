@@ -1,0 +1,12 @@
+POST http://localhost:8080/api/todos
+Content-Type: application/json
+
+{
+    "task": "Learn Spring"
+}
+###
+GET http://localhost:8080/api/todos/1
+###
+PATCH http://localhost:8080/api/todos/1/complete
+###
+DELETE http://localhost:8080/api/todos/1
