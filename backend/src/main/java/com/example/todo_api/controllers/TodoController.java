@@ -3,7 +3,9 @@ package com.example.todo_api.controllers;
 import java.net.URI;
 import java.util.Map;
 
-import org.springframework.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.todo_api.models.Todo;
@@ -21,14 +24,21 @@ import com.example.todo_api.services.TodoService;
 @RequestMapping("/api/todos")
 public class TodoController {
     private final TodoService svc;
+    private static final Logger log = LoggerFactory.getLogger(TodoController.class);
     
     public TodoController(TodoService inj) {
         this.svc = inj;
     }
 
+    @GetMapping
+    public ResponseEntity<Object> getTodo(@RequestParam(defaultValue = "20") int limit, @RequestParam(required = false) Long cursor) {
+        return ResponseEntity.ok(this.svc.getTodosWithCursor(cursor, limit));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Object> getTodo(@PathVariable Long id) {
-        Todo res = this.svc.getOneTodo(id);
+        Todo res = this.svc.getOneTodo(id);;
+        log.info("returned value from getOneTodo {}", res);
         if (res == null)
             return ResponseEntity.notFound().build();
         return ResponseEntity.ok(res);

@@ -1,5 +1,7 @@
 package com.example.todo_api.services;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.example.todo_api.models.Todo;
@@ -20,6 +22,12 @@ public class TodoService {
 
     public boolean deleteTodo(Long id) {
         return this.todoRepo.deleteById(id) > 0;
+    }
+
+    public List<Todo> getTodosWithCursor(Long cursor, int limit) {
+        if (cursor == null)
+            return this.todoRepo.selectAll(limit);
+        return this.todoRepo.selectAllAfter(cursor, limit);
     }
 
     public Todo getOneTodo(Long id) {

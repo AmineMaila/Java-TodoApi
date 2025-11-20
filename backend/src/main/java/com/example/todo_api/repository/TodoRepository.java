@@ -1,6 +1,8 @@
 package com.example.todo_api.repository;
 
 import java.sql.PreparedStatement;
+import java.sql.Timestamp;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -30,14 +32,23 @@ public class TodoRepository {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update((connection) -> {
-            PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
+            PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id", "created_at"});
 
             ps.setString(1, todo.getTask());
             ps.setBoolean(2, todo.isCompleted());
             return ps;
         }, keyHolder);
 
-        todo.setId(keyHolder.getKey().longValue());
+        Number generatedId = (Number) keyHolder.getKeys().get("id");
+        if (generatedId != null) {
+            todo.setId(generatedId.longValue());
+        }
+
+        Timestamp generatedTime = (Timestamp) keyHolder.getKeys().get("created_at");
+        if (generatedTime != null) {
+            todo.setCreated_at(generatedTime);
+        }
+
         return todo;
     }
 
@@ -48,10 +59,42 @@ public class TodoRepository {
     }
 
     public int completeById(Long id) {
-        String sql = "UPDATE todos SET completed = TRUE WHERE id = ?";
+        String sql = "UPDATE todos SET completed = TRUE, completed_at = CURRENT_TIMESTAMP WHERE id = ?";
 
         return jdbcTemplate.update(sql, id);
     }
+
+    public List<Todo> selectAll(int limit) {
+        String sql = "SELECT * FROM todos ORDER BY id DESC LIMIT ?";
+        return jdbcTemplate.query(
+            sql,
+            (rs, rowNum) -> new Todo(
+                rs.getLong("id"),
+                rs.getString("task"),
+                rs.getBoolean("completed"),
+                rs.getTimestamp("created_at"),
+                rs.getTimestamp("completed_at")
+            ),
+            limit
+        );
+    }
+
+    public List<Todo> selectAllAfter(Long lastId, int limit) {
+        String sql = "SELECT * FROM todos WHERE id < ? ORDER BY id DESC LIMIT ?";
+        return jdbcTemplate.query(
+            sql,
+            (rs, rowNum) -> new Todo(
+                rs.getLong("id"),
+                rs.getString("task"),
+                rs.getBoolean("completed"),
+                rs.getTimestamp("created_at"),
+                rs.getTimestamp("completed_at")
+            ),
+            lastId,
+            limit
+        );
+    }
+
 
     public Todo selectById(Long id) {
         try {
@@ -64,7 +107,9 @@ public class TodoRepository {
                     return new Todo(
                         rs.getLong("id"),
                         rs.getString("task"),
-                        rs.getBoolean("completed")
+                        rs.getBoolean("completed"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("completed_at")
                     );
                 },
                 id
