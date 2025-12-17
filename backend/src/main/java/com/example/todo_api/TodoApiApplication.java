@@ -22,5 +22,4 @@ public class TodoApiApplication {
             System.out.println("----------------------------------------");
 		};
 	}
-
 }

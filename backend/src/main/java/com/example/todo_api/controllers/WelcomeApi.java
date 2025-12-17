@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api")
 public class WelcomeApi {
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<Object> welcomeUser() {
         return ResponseEntity.ok().body(Map.of("Welcome", "To my Todo Api"));
     }

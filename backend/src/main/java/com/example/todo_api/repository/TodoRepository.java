@@ -4,7 +4,6 @@ import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -21,7 +20,6 @@ public class TodoRepository {
     private final JdbcTemplate jdbcTemplate;
     private static final Logger log = LoggerFactory.getLogger(TodoRepository.class);
 
-    @Autowired
     TodoRepository(JdbcTemplate inj) {
         this.jdbcTemplate = inj;
     }
@@ -65,6 +63,7 @@ public class TodoRepository {
     }
 
     public List<Todo> selectAll(int limit) {
+		log.info("Limit: {}", limit);
         String sql = "SELECT * FROM todos ORDER BY id DESC LIMIT ?";
         return jdbcTemplate.query(
             sql,

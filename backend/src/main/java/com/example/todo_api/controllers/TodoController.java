@@ -1,7 +1,6 @@
 package com.example.todo_api.controllers;
 
 import java.net.URI;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,14 +30,13 @@ public class TodoController {
     }
 
     @GetMapping
-    public ResponseEntity<Object> getTodo(@RequestParam(defaultValue = "20") int limit, @RequestParam(required = false) Long cursor) {
+    public ResponseEntity<Object> getTodo(@RequestParam(defaultValue = "10") int limit, @RequestParam(required = false) Long cursor) {
         return ResponseEntity.ok(this.svc.getTodosWithCursor(cursor, limit));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Object> getTodo(@PathVariable Long id) {
         Todo res = this.svc.getOneTodo(id);;
-        log.info("returned value from getOneTodo {}", res);
         if (res == null)
             return ResponseEntity.notFound().build();
         return ResponseEntity.ok(res);

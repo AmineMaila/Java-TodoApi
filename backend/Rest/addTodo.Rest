@@ -5,7 +5,7 @@ Content-Type: application/json
     "task": "Learn Spring"
 }
 ###
-GET http://localhost:8080/api/todos?cursor=3
+GET http://localhost:8080/api/todos
 ###
 GET http://localhost:8080/api/todos/1
 ###
